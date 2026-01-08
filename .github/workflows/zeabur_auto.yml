@@ -1,0 +1,34 @@
+name: Zeabur Auto Restart
+
+on:
+  schedule:
+    # 北京时间周一中午 12:00 (UTC 04:00)
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+jobs:
+  zeabur-restart:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        # 【修改点】在这里直接写库的名字，不再读取 requirements.txt
+        run: |
+          pip install playwright requests
+          playwright install chromium
+
+      - name: Run Auto Script
+        env:
+          ZEABUR_EMAIL: ${{ secrets.ZEABUR_EMAIL }}
+          ZEABUR_PASSWORD: ${{ secrets.ZEABUR_PASSWORD }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python main.py
